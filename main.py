@@ -25,7 +25,7 @@ def det_dx(f, N):
 
 
 def model():
-    N = 0
+    N_model = 0
     t_wait_queue = 0
     t_wait_pc_1 = 0
     t_wait_pc_2 = 0
@@ -40,9 +40,10 @@ def model():
     t_handle = -1
     simulation_time = 0
     _queue = queue.Queue()
-    while N != 1000:
+    while N_model <= 1000:
         if _queue.empty() is False:
             t_wait_queue += 1
+            t_in_system += 1
         if pc_1_is_busy is False:
             t_wait_pc_1 += 1
         if pc_2_is_busy is False:
@@ -50,21 +51,11 @@ def model():
         if pc_1_is_busy is True or pc_2_is_busy is True:
             t_in_system += 1
         if simulation_time == pc_1_end:
-            N += 1
+            N_model += 1
             pc_1_is_busy = False
         if simulation_time == pc_2_end:
-            N += 1
+            N_model += 1
             pc_2_is_busy = False
-        if simulation_time == t_input_end and simulation_time != 0:
-            channel_is_busy = False
-            if pc_1_is_busy is False:
-                pc_1_end = simulation_time + t_handle
-                pc_1_is_busy = True
-            elif pc_2_is_busy is False:
-                pc_2_end = simulation_time + t_handle
-                pc_2_is_busy = True
-            else:
-                _queue.put(t_handle)
         if pc_1_is_busy is False and _queue.empty() is False:
             pc_1_end = simulation_time + _queue.get()
             pc_1_is_busy = True
@@ -76,8 +67,17 @@ def model():
             t_handle = randint(1, 19)
             t_input_end = simulation_time + t_input
             channel_is_busy = True
+        if simulation_time == t_input_end and simulation_time != 0:
+            channel_is_busy = False
+            if pc_1_is_busy is False:
+                pc_1_end = simulation_time + t_handle
+                pc_1_is_busy = True
+            elif pc_2_is_busy is False:
+                pc_2_end = simulation_time + t_handle
+                pc_2_is_busy = True
+            else:
+                _queue.put(t_handle)
         simulation_time += 1
-    print(50*"*")
     return t_wait_queue, t_wait_pc_1, t_wait_pc_2, t_in_system, simulation_time
 
 
