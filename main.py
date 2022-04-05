@@ -3,11 +3,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from random import randint
 import queue
+from beautifultable import BeautifulTable
 
 #8 вариант
 #cos(2t)^2 + sin(2t)
 
 #T поступление (1, 15) T обработки (1, 19)
+
+
+def table_view(count_list, t_list, ft_list, ftdt_list, det_dx_, df_list):
+    table = BeautifulTable()
+    table.columns.header = ["i", "ti", "f(ti)", "f(ti + dt)", "(f(ti + dt) - x(ti)) / dt", "f'(t)"]
+    for i in range(len(count_list)):
+        table.rows.append([count_list[i], t_list[i], ft_list[i], ftdt_list[i], det_dx_[i], df_list[i]])
+    print(table)
 
 
 def det_dx(f, N):
@@ -16,12 +25,20 @@ def det_dx(f, N):
     f = lambdify(t, f)
     t = 0
     _det_dx = []
+    t_list = []
+    count_list = []
+    ft_list = []
+    ftdt_list = []
     count = 0
     while count != N + 1:
+        ft_list.append(f(t))
+        t_list.append(t)
+        ftdt_list.append(f(t + dt))
+        count_list.append(count)
         _det_dx.append((f(t + dt) - f(t)) / dt)
         t += dt
         count += 1
-    return _det_dx
+    return count_list, t_list, ft_list, ftdt_list, _det_dx
 
 
 def model():
@@ -87,10 +104,11 @@ def main():
     x = np.linspace(0, 0.01 * N, N + 1)
     t = symbols('t')
     f = cos(2*t) ** 2 + sin(2 * t)
-    det_dx_ = det_dx(f, N)
+    count_list, t_list, ft_list, ftdt_list, det_dx_ = det_dx(f, N)
     dx = f.diff()
     f = lambdify(t, f)
     dx = lambdify(t, dx)
+    table_view(count_list, t_list, ft_list, ftdt_list, det_dx_, dx(x))
     plt.plot(x, f(x), label='f(t)')
     plt.plot(x, dx(x), label="f'(t)")
     plt.plot(x, det_dx_, label="det f'(t)")
