@@ -99,8 +99,8 @@ def model():
 
 
 def main():
-    #1
-    N = 5000
+    # 1
+    N = 1000
     x = np.linspace(0, 0.01 * N, N + 1)
     t = symbols('t')
     f = cos(2*t) ** 2 + sin(2 * t)
@@ -118,7 +118,16 @@ def main():
     plt.legend()
     plt.show()
 
-    #2
+    # error
+    plt.plot(x, abs(dx(x) - det_dx_), label='error')
+    plt.xlabel('t')
+    plt.ylabel('y')
+    plt.title('error')
+    plt.legend()
+    plt.show()
+    print("Стандартное отклонение = %.3f" % np.std(abs(dx(x)-det_dx_)))
+
+    # 2
     t_average_wait_queue, t_pc_1_average_p, t_pc_2_average_p, t_average_stay_in_system, simulation_time = 0, 0, 0, 0, 0
     for i in range(1, 101):
         print("Эксперимент №%d" % i)
